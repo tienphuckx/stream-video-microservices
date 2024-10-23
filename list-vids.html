@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Catalog</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .video-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 10px;
+            text-align: center;
+            max-width: 320px;
+            transition: transform 0.3s;
+        }
+        .video-card:hover {
+            transform: translateY(-10px);
+        }
+        .video-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .video-title {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        .video-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .video-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Videos</h1>
+    <div class="video-container" id="videoContainer"></div>
+
+    <script>
+        // Fetch video list from API
+        fetch('http://localhost:8080/api/catalog/vid/list')
+            .then(response => response.json())
+            .then(data => {
+                const videoContainer = document.getElementById('videoContainer');
+
+                data.forEach(video => {
+                    const videoCard = document.createElement('div');
+                    videoCard.classList.add('video-card');
+
+                    // Create the title
+                    const videoTitle = document.createElement('div');
+                    videoTitle.classList.add('video-title');
+                    videoTitle.textContent = video.vidName;
+                    videoCard.appendChild(videoTitle);
+
+                    // Create the video element
+                    const videoElement = document.createElement('video');
+                    videoElement.src = `http://localhost:8080/api/stream/vid/id/${video.id}#t=2`; // Start from 2-second timestamp
+                    videoElement.controls = true;
+                    videoCard.appendChild(videoElement);
+
+                    // Create the description
+                    const videoDescription = document.createElement('div');
+                    videoDescription.classList.add('video-description');
+                    videoDescription.textContent = video.vidDescription;
+                    videoCard.appendChild(videoDescription);
+
+                    // Append the card to the container
+                    videoContainer.appendChild(videoCard);
+                });
+            })
+            .catch(error => console.error('Error fetching video data:', error));
+    </script>
+</body>
+</html>
